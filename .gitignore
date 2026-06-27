@@ -1,4 +1,24 @@
+# Dependencies
 node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment files
 .env
+server/.env
+client/.env
+
+# Build folders
 dist/
 build/
+client/dist/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
