@@ -5,6 +5,7 @@ const {
   loginUser,
   logoutUser,
   getCurrentUser,
+  getProfile,
 } = require("../controllers/auth.controller");
 const {
   isAuthenticated,

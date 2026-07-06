@@ -1,4 +1,5 @@
 const express = require("express");
+console.log("APP.JS LOADED");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
@@ -9,9 +10,24 @@ const applicationRoutes = require("./routes/application.routes");
 
 const app = express();
 
-app.use(cors());
+
+ app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(cookieParser());
+
+// Test Route
+app.get("/api", (req, res) => {
+  res.json({
+    success: true,
+    message: "Backend Connected Successfully",
+  });
+});
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -19,6 +35,7 @@ app.use("/api/company", companyRoutes);
 app.use("/api/job", jobRoutes);
 app.use("/api/application", applicationRoutes);
 
+// Root Route
 app.get("/", (req, res) => {
   res.send("Backend Running...");
 });
