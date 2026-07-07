@@ -20,23 +20,19 @@ function Register() {
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
 
     try {
-
       const data = await registerUser(formData);
 
       alert(data.message);
 
-      console.log(data);
-
       navigate("/login");
-
     } catch (error) {
+      console.error(error);
 
       alert(error.response?.data?.message || "Registration Failed");
-
     }
   };
 
@@ -44,61 +40,77 @@ function Register() {
     <div>
       <h2>Register</h2>
 
-      <form onSubmit={handleSubmit}>
-
+      <form onSubmit={handleRegister}>
         <input
           type="text"
           name="fullName"
           placeholder="Full Name"
+          value={formData.fullName}
           onChange={handleChange}
+          required
         />
 
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="email"
           name="email"
           placeholder="Email"
+          value={formData.email}
           onChange={handleChange}
+          required
         />
 
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="password"
           name="password"
           placeholder="Password"
+          value={formData.password}
           onChange={handleChange}
+          required
         />
 
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="text"
           name="phone"
-          placeholder="Phone"
+          placeholder="Phone Number"
+          value={formData.phone}
           onChange={handleChange}
+          required
         />
 
-        <br /><br />
+        <br />
+        <br />
 
         <select
           name="role"
+          value={formData.role}
           onChange={handleChange}
         >
           <option value="candidate">Candidate</option>
           <option value="recruiter">Recruiter</option>
         </select>
 
-        <br /><br />
+        <br />
+        <br />
 
         <button type="submit">
           Register
         </button>
-
       </form>
+
+      <br />
+
       <p>
-        Already have an account? <Link to="/login">Login</Link>
+        Already have an account?{" "}
+        <Link to="/login">Login</Link>
       </p>
     </div>
   );

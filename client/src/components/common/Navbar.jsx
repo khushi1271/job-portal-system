@@ -11,9 +11,11 @@ function Navbar() {
   const user = auth?.user;
 
   const handleLogout = () => {
+    // Redux state + localStorage clear
     dispatch(logout());
-    localStorage.removeItem("token");
-    navigate("/login");
+
+    // Redirect to Login page
+    navigate("/login", { replace: true });
   };
 
   return (
@@ -28,8 +30,10 @@ function Navbar() {
         color: "white",
       }}
     >
+      {/* Logo */}
       <h2>Job Portal</h2>
 
+      {/* Search Box */}
       <div
         style={{
           display: "flex",
@@ -54,6 +58,7 @@ function Navbar() {
         />
       </div>
 
+      {/* Right Section */}
       <div
         style={{
           display: "flex",
@@ -71,20 +76,24 @@ function Navbar() {
           }}
         >
           <FaUserCircle size={28} />
-          <span>{user?.fullName ?? "User"}</span>
+          <span>{user?.fullName || "User"}</span>
         </div>
 
         <button
           onClick={handleLogout}
           style={{
-            padding: "8px 15px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
             background: "#ef4444",
             color: "white",
             border: "none",
+            padding: "10px 16px",
             borderRadius: "6px",
             cursor: "pointer",
           }}
         >
+          <FaSignOutAlt />
           Logout
         </button>
       </div>

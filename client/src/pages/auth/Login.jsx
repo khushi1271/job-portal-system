@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
+
 import { loginSuccess } from "../../redux/authSlice";
 import { loginUser } from "../../services/authService";
 
@@ -35,13 +36,12 @@ function Login() {
 
       localStorage.setItem("token", data.token);
 
-      alert("Login Successful");
-
-      console.log(data);
+      alert("Login Successful ✅");
 
       navigate("/dashboard");
-
     } catch (error) {
+      console.error(error);
+
       alert(error.response?.data?.message || "Login Failed");
     }
   };
@@ -51,32 +51,38 @@ function Login() {
       <h2>Login</h2>
 
       <form onSubmit={handleSubmit}>
-
         <input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="Enter Email"
+          value={formData.email}
           onChange={handleChange}
+          required
         />
 
-        <br /><br />
+        <br />
+        <br />
 
         <input
           type="password"
           name="password"
-          placeholder="Password"
+          placeholder="Enter Password"
+          value={formData.password}
           onChange={handleChange}
+          required
         />
 
-        <br /><br />
+        <br />
+        <br />
 
-        <button type="submit">
-          Login
-        </button>
-
+        <button type="submit">Login</button>
       </form>
+
+      <br />
+
       <p>
-        Don't have an account? <Link to="/register">Register</Link>
+        Don't have an account?{" "}
+        <Link to="/register">Register</Link>
       </p>
     </div>
   );
