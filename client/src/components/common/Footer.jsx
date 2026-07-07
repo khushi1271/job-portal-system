@@ -1,9 +1,15 @@
-import React from "react";
-
 function Footer() {
   return (
-    <footer className="footer" style={{ padding: "1rem", borderTop: "1px solid #ccc", textAlign: "center" }}>
-      <p>&copy; {new Date().getFullYear()} Job Portal. All rights reserved.</p>
+    <footer
+      style={{
+        background: "#1e293b",
+        color: "white",
+        textAlign: "center",
+        padding: "15px",
+        marginTop: "30px",
+      }}
+    >
+      © {new Date().getFullYear()} Job Portal | Built with React & Node.js
     </footer>
   );
 }

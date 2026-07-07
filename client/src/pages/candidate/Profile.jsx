@@ -1,12 +1,5 @@
-import React from "react";
-
 function Profile() {
-  return (
-    <div className="profile-page">
-      <h2>My Profile</h2>
-      <p>Manage your professional details, resume, and credentials.</p>
-    </div>
-  );
+  return <h1>Profile Page</h1>;
 }
 
 export default Profile;

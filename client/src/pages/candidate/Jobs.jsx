@@ -1,12 +1,5 @@
-import React from "react";
-
 function Jobs() {
-  return (
-    <div className="jobs-page">
-      <h2>Available Jobs</h2>
-      <p>Browse and apply for the latest job openings.</p>
-    </div>
-  );
+  return <h1>Jobs Page</h1>;
 }
 
 export default Jobs;

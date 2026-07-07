@@ -1,10 +1,79 @@
-import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  FaHome,
+  FaBriefcase,
+  FaFileAlt,
+  FaUser,
+} from "react-icons/fa";
 
 function Sidebar() {
+  const menu = [
+    {
+      name: "Dashboard",
+      icon: <FaHome />,
+      path: "/dashboard",
+    },
+    {
+      name: "Jobs",
+      icon: <FaBriefcase />,
+      path: "/jobs",
+    },
+    {
+      name: "Applications",
+      icon: <FaFileAlt />,
+      path: "/applications",
+    },
+    {
+      name: "Profile",
+      icon: <FaUser />,
+      path: "/profile",
+    },
+  ];
+
   return (
-    <aside className="sidebar" style={{ width: "250px", padding: "1rem", borderRight: "1px solid #ccc" }}>
-      <h3>Sidebar Menu</h3>
-    </aside>
+    <div
+      style={{
+        width: "260px",
+        minWidth: "260px",
+        background: "#fff",
+        borderRight: "1px solid #e5e7eb",
+        minHeight: "calc(100vh - 70px)",
+        paddingTop: "25px",
+      }}
+    >
+      <h3
+        style={{
+          marginLeft: "20px",
+          marginBottom: "25px",
+          color: "#6b7280",
+        }}
+      >
+        MENU
+      </h3>
+
+      {menu.map((item) => (
+        <NavLink
+          key={item.path}
+          to={item.path}
+          style={({ isActive }) => ({
+            display: "flex",
+            alignItems: "center",
+            gap: "15px",
+            textDecoration: "none",
+            padding: "15px 20px",
+            margin: "8px",
+            borderRadius: "10px",
+            fontWeight: "500",
+            color: isActive ? "#2563eb" : "#374151",
+            background: isActive ? "#dbeafe" : "transparent",
+            transition: "0.3s",
+          })}
+        >
+          {item.icon}
+          {item.name}
+        </NavLink>
+      ))}
+    </div>
   );
 }
 
