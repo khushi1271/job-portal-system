@@ -4,6 +4,7 @@ import {
   FaBriefcase,
   FaFileAlt,
   FaUser,
+  FaBuilding,
 } from "react-icons/fa";
 
 function Sidebar() {
@@ -17,6 +18,11 @@ function Sidebar() {
       name: "Jobs",
       icon: <FaBriefcase />,
       path: "/jobs",
+    },
+    {
+      name: "Companies",
+      icon: <FaBuilding />,
+      path: "/companies",
     },
     {
       name: "Applications",
