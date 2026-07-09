@@ -32,7 +32,7 @@ app.get("/api", (req, res) => {
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/company", companyRoutes);
-app.use("/api/job", jobRoutes);
+app.use("/api/jobs", jobRoutes);
 app.use("/api/application", applicationRoutes);
 
 // Root Route

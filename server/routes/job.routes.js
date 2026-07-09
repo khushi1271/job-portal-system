@@ -25,7 +25,7 @@ router.post(
 
 // Get All Jobs
 router.get(
-  "/all",
+  "/",
   isAuthenticated,
   getAllJobs
 );

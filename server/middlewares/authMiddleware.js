@@ -3,10 +3,25 @@ const User = require("../models/User");
 
 const isAuthenticated = async (req, res, next) => {
   try {
-    // Cookie se token lena
-    const token = req.cookies.token;
+let token = null;
 
-    // Token nahi mila
+console.log("Authorization Header:", req.headers.authorization);
+console.log("Cookies:", req.cookies);
+
+if (
+  req.headers.authorization &&
+  req.headers.authorization.startsWith("Bearer ")
+) {
+  token = req.headers.authorization.split(" ")[1];
+}
+
+if (!token && req.cookies.token) {
+  token = req.cookies.token;
+}
+
+console.log("Final Token:", token);
+
+    // 3. Token nahi mila
     if (!token) {
       return res.status(401).json({
         success: false,
@@ -14,10 +29,10 @@ const isAuthenticated = async (req, res, next) => {
       });
     }
 
-    // Token verify karna
+    // 4. Verify Token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // User database se nikalna
+    // 5. Find User
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
@@ -27,11 +42,9 @@ const isAuthenticated = async (req, res, next) => {
       });
     }
 
-    // User request me store karna
     req.user = user;
 
     next();
-
   } catch (error) {
     return res.status(401).json({
       success: false,
@@ -42,7 +55,6 @@ const isAuthenticated = async (req, res, next) => {
 
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
-
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
@@ -53,6 +65,7 @@ const authorizeRoles = (...roles) => {
     next();
   };
 };
+
 module.exports = {
   isAuthenticated,
   authorizeRoles,
