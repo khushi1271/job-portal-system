@@ -52,9 +52,11 @@ console.log("Final Token:", token);
     });
   }
 };
-
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
+    console.log("Required Roles:", roles);
+    console.log("Logged In User Role:", req.user.role);
+
     if (!roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
@@ -65,7 +67,6 @@ const authorizeRoles = (...roles) => {
     next();
   };
 };
-
 module.exports = {
   isAuthenticated,
   authorizeRoles,
