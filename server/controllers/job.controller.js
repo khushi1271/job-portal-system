@@ -227,9 +227,30 @@ const deleteJob = async (req, res) => {
   }
 };
 
+const getRecruiterJobs = async (req, res) => {
+  try {
+    const jobs = await Job.find({
+      createdBy: req.user._id,
+    })
+      .populate("company")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: jobs.length,
+      jobs,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 module.exports = {
   createJob,
   getAllJobs,
+  getRecruiterJobs,
   getJobById,
   updateJob,
   deleteJob,
