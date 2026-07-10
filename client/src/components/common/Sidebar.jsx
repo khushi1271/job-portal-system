@@ -1,3 +1,4 @@
+
 import { NavLink } from "react-router-dom";
 import {
   FaHome,
@@ -18,6 +19,11 @@ function Sidebar() {
       name: "Jobs",
       icon: <FaBriefcase />,
       path: "/jobs",
+    },
+    {
+      name: "Manage Jobs",
+      icon: <FaBriefcase />,
+      path: "/recruiter/jobs",
     },
     {
       name: "Companies",
