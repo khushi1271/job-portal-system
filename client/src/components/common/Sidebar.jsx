@@ -40,6 +40,11 @@ function Sidebar() {
       icon: <FaUser />,
       path: "/profile",
     },
+
+    {
+  name: "Dashboard",
+  path: "/recruiter/dashboard",
+}
   ];
 
   return (

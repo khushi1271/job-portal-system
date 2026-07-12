@@ -13,13 +13,36 @@ function RecruiterJobs() {
 
   const fetchJobs = async () => {
     try {
+      setLoading(true);
+
       const res = await api.get("/jobs/recruiter");
+
       setJobs(res.data.jobs || []);
     } catch (error) {
       console.log(error);
       setJobs([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this job?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const res = await api.delete(`/jobs/delete/${id}`);
+
+      alert(res.data.message);
+
+      fetchJobs();
+    } catch (error) {
+      console.log(error);
+
+      alert(error.response?.data?.message || "Delete Failed");
     }
   };
 
@@ -115,8 +138,7 @@ function RecruiterJobs() {
               </p>
 
               <p>
-                <strong>Location:</strong>{" "}
-                {job.location}
+                <strong>Location:</strong> {job.location}
               </p>
 
               <p>
@@ -124,13 +146,11 @@ function RecruiterJobs() {
               </p>
 
               <p>
-                <strong>Experience:</strong>{" "}
-                {job.experience} Years
+                <strong>Experience:</strong> {job.experience} Years
               </p>
 
               <p>
-                <strong>Job Type:</strong>{" "}
-                {job.jobType}
+                <strong>Job Type:</strong> {job.jobType}
               </p>
 
               <div
@@ -156,6 +176,7 @@ function RecruiterJobs() {
                 </Link>
 
                 <button
+                  onClick={() => handleDelete(job._id)}
                   style={{
                     flex: 1,
                     background: "#dc2626",
@@ -163,6 +184,7 @@ function RecruiterJobs() {
                     border: "none",
                     borderRadius: "8px",
                     cursor: "pointer",
+                    padding: "10px",
                   }}
                 >
                   Delete
@@ -193,3 +215,4 @@ function RecruiterJobs() {
 }
 
 export default RecruiterJobs;
+

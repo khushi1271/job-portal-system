@@ -16,6 +16,7 @@ import RecruiterJobs from "./pages/recruiter/RecruiterJobs";
 import AddJob from "./pages/recruiter/AddJob";
 import EditJob from "./pages/recruiter/EditJob";
 import JobApplicants from "./pages/recruiter/JobApplicants";
+import RecruiterDashboard from "./pages/recruiter/Dashboard";
 
 function App() {
   return (
@@ -58,6 +59,11 @@ function App() {
 
 <Route path="/recruiter/jobs/edit/:id" element={<EditJob />} />
 
+
+<Route
+  path="/recruiter/dashboard"
+  element={<RecruiterDashboard />}
+/>
 <Route
   path="/recruiter/jobs/:id/applicants"
   element={<JobApplicants />}
