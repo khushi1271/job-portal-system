@@ -247,10 +247,39 @@ const getRecruiterJobs = async (req, res) => {
     });
   }
 };
+
+// ================= RECRUITER STATS =================
+const getRecruiterStats = async (req, res) => {
+  try {
+    const totalJobs = await Job.countDocuments({
+      createdBy: req.user._id,
+    });
+
+    const activeJobs = await Job.countDocuments({
+      createdBy: req.user._id,
+    });
+
+    return res.status(200).json({
+      success: true,
+      stats: {
+        totalJobs,
+        activeJobs,
+      },
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   createJob,
   getAllJobs,
   getRecruiterJobs,
+  getRecruiterStats,
   getJobById,
   updateJob,
   deleteJob,

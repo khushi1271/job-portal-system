@@ -5,10 +5,11 @@ const router = express.Router();
 const {
   createJob,
   getAllJobs,
+  getRecruiterJobs,
   getJobById,
   updateJob,
-   getRecruiterJobs,
-  deleteJob
+  deleteJob,
+  getRecruiterStats
 } = require("../controllers/job.controller");
 
 const {
@@ -24,6 +25,14 @@ router.post(
   createJob
 );
 
+// Recruiter Jobs (IMPORTANT: :id se pehle)
+router.get(
+  "/recruiter",
+  isAuthenticated,
+  authorizeRoles("recruiter"),
+  getRecruiterJobs
+);
+
 // Get All Jobs
 router.get(
   "/",
@@ -31,7 +40,7 @@ router.get(
   getAllJobs
 );
 
-// Get Job By ID
+// Get Job By ID (Hamesha last me)
 router.get(
   "/:id",
   isAuthenticated,
@@ -46,6 +55,7 @@ router.put(
   updateJob
 );
 
+// Delete Job
 router.delete(
   "/delete/:id",
   isAuthenticated,
@@ -54,10 +64,10 @@ router.delete(
 );
 
 router.get(
-  "/recruiter",
+  "/recruiter/stats",
   isAuthenticated,
   authorizeRoles("recruiter"),
-  getRecruiterJobs
+  getRecruiterStats
 );
 
 module.exports = router;
