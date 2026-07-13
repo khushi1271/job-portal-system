@@ -11,31 +11,43 @@ function Jobs() {
     fetchJobs();
   }, [keyword]);
 
-const fetchJobs = async () => {
-  try {
-    setLoading(true);
-    setError("");
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-    const res = await api.get(`/jobs?keyword=${keyword}`);
+      const res = await api.get(`/jobs?keyword=${keyword}`);
 
-    console.log("SUCCESS");
-    console.log("Status:", res.status);
-    console.log("Data:", res.data);
+      setJobs(res.data.jobs || []);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to load jobs. Please try again.");
+      setJobs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    setJobs(res.data.jobs || []);
-  } catch (err) {
-    console.log("ERROR");
-    console.log(err);
+  // ================= APPLY JOB =================
+  const handleApply = async (jobId) => {
+    try {
+      const res = await api.post("/application/apply", {
+        jobId,
+      });
 
-    console.log("Status:", err.response?.status);
-    console.log("Response:", err.response?.data);
+      alert(res.data.message);
 
-    setError("Failed to load jobs. Please try again.");
-    setJobs([]);
-  } finally {
-    setLoading(false);
-  }
-};
+      // Refresh jobs (optional)
+      fetchJobs();
+    } catch (error) {
+      console.log(error);
+
+      alert(
+        error.response?.data?.message ||
+          "Application Failed"
+      );
+    }
+  };
 
   return (
     <div>
@@ -47,7 +59,6 @@ const fetchJobs = async () => {
         Available Jobs
       </h1>
 
-      {/* Search Box */}
       <input
         type="text"
         placeholder="Search Jobs..."
@@ -78,7 +89,6 @@ const fetchJobs = async () => {
         <h2
           style={{
             color: "red",
-            marginTop: "20px",
           }}
         >
           {error}
@@ -107,7 +117,7 @@ const fetchJobs = async () => {
 
               <p>
                 <strong>Company:</strong>{" "}
-                {job.company?.name || job.company?.companyName || "N/A"}
+                {job.company?.name || "N/A"}
               </p>
 
               <p>
@@ -136,6 +146,7 @@ const fetchJobs = async () => {
               </p>
 
               <button
+                onClick={() => handleApply(job._id)}
                 style={{
                   width: "100%",
                   padding: "10px",
