@@ -1,17 +1,20 @@
 const express = require("express");
 console.log("APP.JS LOADED");
+
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
+// Routes
 const authRoutes = require("./routes/auth.routes");
 const companyRoutes = require("./routes/company.routes");
 const jobRoutes = require("./routes/job.routes");
 const applicationRoutes = require("./routes/application.routes");
+const notificationRoutes = require("./routes/notification.routes");
 
 const app = express();
 
-
- app.use(
+// Middleware
+app.use(
   cors({
     origin: ["http://localhost:5173", "http://localhost:5174"],
     credentials: true,
@@ -29,11 +32,12 @@ app.get("/api", (req, res) => {
   });
 });
 
-// Routes
+// API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/application", applicationRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Root Route
 app.get("/", (req, res) => {
