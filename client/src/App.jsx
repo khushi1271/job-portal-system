@@ -17,6 +17,8 @@ import AddJob from "./pages/recruiter/AddJob";
 import EditJob from "./pages/recruiter/EditJob";
 import JobApplicants from "./pages/recruiter/JobApplicants";
 import RecruiterDashboard from "./pages/recruiter/Dashboard";
+import Notifications from "./pages/candidate/Notifications";
+import RecruiterNotifications from "./pages/recruiter/RecruiterNotifications";
 
 function App() {
   return (
@@ -49,6 +51,9 @@ function App() {
           <Route path="/companies/add" element={<AddCompany />} />
           <Route path="/companies/:id" element={<CompanyDetails />} />
           <Route path="/companies/edit/:id" element={<EditCompany />} />
+          {/* Notifications Route */}
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/recruiter/notifications" element={<RecruiterNotifications />} />
         </Route>
 
 {/* Recruiter Job Routes */}
