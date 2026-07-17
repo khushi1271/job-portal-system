@@ -1,4 +1,3 @@
-
 import { NavLink } from "react-router-dom";
 import {
   FaHome,
@@ -6,6 +5,7 @@ import {
   FaFileAlt,
   FaUser,
   FaBuilding,
+  FaComments,
 } from "react-icons/fa";
 
 function Sidebar() {
@@ -36,15 +36,20 @@ function Sidebar() {
       path: "/applications",
     },
     {
+      name: "Chat",
+      icon: <FaComments />,
+      path: "/chat",
+    },
+    {
       name: "Profile",
       icon: <FaUser />,
       path: "/profile",
     },
-
     {
-  name: "Dashboard",
-  path: "/recruiter/dashboard",
-}
+      name: "Recruiter Dashboard",
+      icon: <FaHome />,
+      path: "/recruiter/dashboard",
+    },
   ];
 
   return (

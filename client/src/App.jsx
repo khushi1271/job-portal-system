@@ -19,7 +19,9 @@ import JobApplicants from "./pages/recruiter/JobApplicants";
 import RecruiterDashboard from "./pages/recruiter/Dashboard";
 import Notifications from "./pages/candidate/Notifications";
 import RecruiterNotifications from "./pages/recruiter/RecruiterNotifications";
-
+import AdminDashboard from "./pages/admin/Dashboard";
+import Users from "./pages/admin/Users";
+import Chat from "./pages/chat/Chat";
 function App() {
   return (
     <BrowserRouter>
@@ -54,6 +56,10 @@ function App() {
           {/* Notifications Route */}
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/recruiter/notifications" element={<RecruiterNotifications />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/chat" element={<Chat />} />
+
+        <Route path="/admin/users" element={<Users />} />
         </Route>
 
 {/* Recruiter Job Routes */}
