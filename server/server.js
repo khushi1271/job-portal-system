@@ -1,9 +1,47 @@
 require("dotenv").config();
 
+const http = require("http");
+const { Server } = require("socket.io");
+
 const app = require("./app");
 const connectDB = require("./config/db");
 
 const PORT = process.env.PORT || 5000;
+
+// Create HTTP Server
+const server = http.createServer(app);
+
+// Create Socket.IO Server
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173", "http://localhost:5174"],
+    credentials: true,
+  },
+});
+
+// ================= SOCKET CONNECTION =================
+
+io.on("connection", (socket) => {
+  console.log("🟢 User Connected:", socket.id);
+
+  // User joins own room
+  socket.on("join", (userId) => {
+    socket.join(userId);
+    console.log(`✅ User Joined Room: ${userId}`);
+  });
+
+  // Send Message
+  socket.on("sendMessage", (data) => {
+    io.to(data.receiver).emit("receiveMessage", data);
+  });
+
+  // Disconnect
+  socket.on("disconnect", () => {
+    console.log("🔴 User Disconnected:", socket.id);
+  });
+});
+
+// ================= START SERVER =================
 
 (async () => {
   try {
@@ -12,7 +50,7 @@ const PORT = process.env.PORT || 5000;
 
     console.log("Step 2: Starting Server...");
 
-    app.listen(PORT, "127.0.0.1", () => {
+    server.listen(PORT, "127.0.0.1", () => {
       console.log(`✅ Server Started on http://127.0.0.1:${PORT}`);
     });
 

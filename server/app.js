@@ -10,7 +10,8 @@ const companyRoutes = require("./routes/company.routes");
 const jobRoutes = require("./routes/job.routes");
 const applicationRoutes = require("./routes/application.routes");
 const notificationRoutes = require("./routes/notification.routes");
-
+const adminRoutes = require("./routes/admin.routes");
+const messageRoutes = require("./routes/message.routes");
 const app = express();
 
 // Middleware
@@ -38,6 +39,8 @@ app.use("/api/company", companyRoutes);
 app.use("/api/jobs", jobRoutes);
 app.use("/api/application", applicationRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/messages", messageRoutes);
 
 // Root Route
 app.get("/", (req, res) => {
