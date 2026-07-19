@@ -27,7 +27,16 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Root Redirect */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/"
+          element={
+            localStorage.getItem("token") ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        />
 
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />

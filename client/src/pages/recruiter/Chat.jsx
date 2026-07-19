@@ -1,10 +1,28 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
+import socket from "../../socket";
 
 function RecruiterChat() {
   const [receiverId, setReceiverId] = useState("");
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const loggedInUser = JSON.parse(localStorage.getItem("user"));
+    if (loggedInUser?._id) {
+      setUser(loggedInUser);
+      socket.emit("join", loggedInUser._id);
+    }
+
+    socket.on("receiveMessage", (message) => {
+      setMessages((prev) => [...prev, message]);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, []);
 
   useEffect(() => {
     if (receiverId) {
@@ -25,13 +43,25 @@ function RecruiterChat() {
     if (!receiverId || !text.trim()) return;
 
     try {
-      await api.post("/messages/send", {
+      // Save message in database
+      const res = await api.post("/messages/send", {
         receiver: receiverId,
         text,
       });
 
+      // Send real-time message through socket
+      socket.emit("sendMessage", {
+        sender: res.data.messageData.sender,
+        receiver: receiverId,
+        text,
+        _id: res.data.messageData._id,
+        createdAt: res.data.messageData.createdAt,
+      });
+
+      // Add message immediately to sender screen
+      setMessages((prev) => [...prev, res.data.messageData]);
+
       setText("");
-      fetchMessages();
     } catch (error) {
       console.log(error);
       alert("Failed to send message");
@@ -77,20 +107,26 @@ function RecruiterChat() {
         {messages.length === 0 ? (
           <p>No messages yet.</p>
         ) : (
-          messages.map((msg) => (
-            <div
-              key={msg._id}
-              style={{
-                marginBottom: "12px",
-                padding: "10px",
-                background: "#f3f4f6",
-                borderRadius: "8px",
-              }}
-            >
-              <strong>{msg.sender?.fullName}:</strong>
-              <p>{msg.text}</p>
-            </div>
-          ))
+          messages.map((msg, index) => {
+            const senderId = typeof msg.sender === "object" ? msg.sender?._id : msg.sender;
+            const isMe = senderId === user?._id;
+            const senderName = typeof msg.sender === "object" ? msg.sender?.fullName : msg.sender;
+
+            return (
+              <div
+                key={msg._id || index}
+                style={{
+                  marginBottom: "12px",
+                  padding: "10px",
+                  background: "#f3f4f6",
+                  borderRadius: "8px",
+                }}
+              >
+                <strong>{isMe ? "You" : senderName}:</strong>
+                <p>{msg.text}</p>
+              </div>
+            );
+          })
         )}
       </div>
 
