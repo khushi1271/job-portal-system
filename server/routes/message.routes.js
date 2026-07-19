@@ -5,6 +5,9 @@ const router = express.Router();
 const {
   sendMessage,
   getMessages,
+  markAsSeen,
+  getConversations,
+  getUnreadCounts,
 } = require("../controllers/message.controller");
 
 const {
@@ -23,6 +26,27 @@ router.get(
   "/:userId",
   isAuthenticated,
   getMessages
+);
+
+// ================= MARK AS SEEN =================
+router.put(
+  "/seen/:userId",
+  isAuthenticated,
+  markAsSeen
+);
+
+// ================= GET CONVERSATIONS =================
+router.get(
+  "/conversations",
+  isAuthenticated,
+  getConversations
+);
+
+// ================= GET UNREAD COUNTS =================
+router.get(
+  "/unread",
+  isAuthenticated,
+  getUnreadCounts
 );
 
 module.exports = router;

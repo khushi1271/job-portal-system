@@ -12,11 +12,14 @@ const sendMessage = async (req, res) => {
       });
     }
 
-    const message = await Message.create({
+    let message = await Message.create({
       sender: req.user._id,
       receiver,
       text,
     });
+
+    // Populate sender details
+    message = await message.populate("sender", "fullName");
 
     return res.status(201).json({
       success: true,
@@ -65,7 +68,119 @@ const getMessages = async (req, res) => {
   }
 };
 
+// ================= MARK AS SEEN =================
+const markAsSeen = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    await Message.updateMany(
+      {
+        sender: userId,
+        receiver: req.user._id,
+        seen: false,
+      },
+      {
+        $set: {
+          seen: true,
+        },
+      }
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Messages marked as seen",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ================= GET CONVERSATIONS =================
+const getConversations = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const messages = await Message.find({
+      $or: [
+        { sender: userId },
+        { receiver: userId },
+      ],
+    })
+      .populate("sender", "fullName")
+      .populate("receiver", "fullName")
+      .sort({ updatedAt: -1 });
+
+    const conversationMap = new Map();
+
+    messages.forEach((msg) => {
+      const otherUser =
+        msg.sender._id.toString() === userId.toString()
+          ? msg.receiver
+          : msg.sender;
+
+      if (!conversationMap.has(otherUser._id.toString())) {
+        conversationMap.set(otherUser._id.toString(), {
+          user: otherUser,
+          lastMessage: msg.text,
+          updatedAt: msg.updatedAt,
+        });
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      conversations: Array.from(conversationMap.values()),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ================= GET UNREAD COUNT =================
+const getUnreadCounts = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const unread = await Message.aggregate([
+      {
+        $match: {
+          receiver: userId,
+          seen: false,
+        },
+      },
+      {
+        $group: {
+          _id: "$sender",
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      unread,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   sendMessage,
   getMessages,
+  markAsSeen,
+  getConversations,
+  getUnreadCounts,
 };
+

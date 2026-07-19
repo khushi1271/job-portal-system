@@ -19,16 +19,39 @@ const io = new Server(server, {
   },
 });
 
-// ================= SOCKET CONNECTION =================
+// ================= ONLINE USERS =================
+const onlineUsers = new Map();
 
+// ================= SOCKET CONNECTION =================
 io.on("connection", (socket) => {
   console.log("🟢 User Connected:", socket.id);
 
   // User joins own room
   socket.on("join", (userId) => {
     socket.join(userId);
+
+    // Save online user
+    onlineUsers.set(userId, socket.id);
+
     console.log(`✅ User Joined Room: ${userId}`);
+
+    // Broadcast online users
+    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
   });
+
+  // User Typing
+socket.on("typing", (data) => {
+  io.to(data.receiver).emit("typing", {
+    sender: data.sender,
+  });
+});
+
+// User Stop Typing
+socket.on("stopTyping", (data) => {
+  io.to(data.receiver).emit("stopTyping", {
+    sender: data.sender,
+  });
+});
 
   // Send Message
   socket.on("sendMessage", (data) => {
@@ -38,11 +61,20 @@ io.on("connection", (socket) => {
   // Disconnect
   socket.on("disconnect", () => {
     console.log("🔴 User Disconnected:", socket.id);
+
+    for (const [userId, socketId] of onlineUsers.entries()) {
+      if (socketId === socket.id) {
+        onlineUsers.delete(userId);
+        break;
+      }
+    }
+
+    // Broadcast updated online users
+    io.emit("onlineUsers", Array.from(onlineUsers.keys()));
   });
 });
 
 // ================= START SERVER =================
-
 (async () => {
   try {
     console.log("Step 1: Connecting DB...");
@@ -53,7 +85,6 @@ io.on("connection", (socket) => {
     server.listen(PORT, "127.0.0.1", () => {
       console.log(`✅ Server Started on http://127.0.0.1:${PORT}`);
     });
-
   } catch (err) {
     console.error("Server Error:", err);
   }
