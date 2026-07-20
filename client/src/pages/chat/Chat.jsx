@@ -10,6 +10,8 @@ function Chat() {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [typing, setTyping] = useState(false);
   const [conversations, setConversations] = useState([]);
+  const [search, setSearch] = useState("");
+  const [unreadCounts, setUnreadCounts] = useState({});
 const typingTimeout = useRef(null);
 
   // Auto Scroll Ref
@@ -34,8 +36,39 @@ useEffect(() => {
   }
 
   socket.on("receiveMessage", (data) => {
-    setMessages((prev) => [...prev, data]);
-  });
+  // Add new message
+  setMessages((prev) => [...prev, data]);
+  setConversations((prev) => {
+  const updated = [...prev];
+
+  const senderId =
+    typeof data.sender === "object"
+      ? data.sender._id
+      : data.sender;
+
+  const index = updated.findIndex(
+    (chat) => chat.user._id === senderId
+  );
+
+  if (index !== -1) {
+    updated[index].lastMessage = data.text;
+
+    const latest = updated.splice(index, 1)[0];
+    updated.unshift(latest);
+  }
+
+  return updated;
+});
+
+  // Increase unread count if chat is not currently open
+  if (data.sender !== receiverId) {
+    setUnreadCounts((prev) => ({
+      ...prev,
+      [data.sender]:
+        (prev[data.sender] || 0) + 1,
+    }));
+  }
+});
 
   socket.on("onlineUsers", (users) => {
     setOnlineUsers(users);
@@ -72,6 +105,28 @@ useEffect(() => {
   fetchConversations();
 }, []);
 
+
+// ================= FETCH UNREAD COUNTS =================
+useEffect(() => {
+  const fetchUnreadCounts = async () => {
+    try {
+      const res = await api.get("/messages/unread");
+
+      const unreadMap = {};
+
+      res.data.unread.forEach((item) => {
+        unreadMap[item._id] = item.count;
+      });
+
+      setUnreadCounts(unreadMap);
+    } catch (error) {
+      console.error("Failed to fetch unread counts", error);
+    }
+  };
+
+  fetchUnreadCounts();
+}, []);
+
   // Fetch old messages
   // Fetch old messages + Mark as Seen
 useEffect(() => {
@@ -82,6 +137,11 @@ useEffect(() => {
       // Fetch messages
       const res = await api.get(`/messages/${receiverId}`);
       setMessages(res.data.messages || []);
+      // Clear unread badge for opened chat
+setUnreadCounts((prev) => ({
+  ...prev,
+  [receiverId]: 0,
+}));
 
       // Mark messages as seen
       await api.put(`/messages/seen/${receiverId}`);
@@ -133,6 +193,49 @@ const sendMessage = async () => {
   }
 };
 
+const clearChat = async () => {
+  if (!receiverId) {
+    alert("Please select a conversation first.");
+    return;
+  }
+
+  const confirmClear = window.confirm(
+    "Are you sure you want to clear this chat?"
+  );
+
+  if (!confirmClear) return;
+
+  try {
+    await api.delete(`/messages/clear/${receiverId}`);
+
+    setMessages([]);
+
+    alert("Chat cleared successfully.");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to clear chat.");
+  }
+};
+
+const deleteMessage = async (messageId) => {
+  const confirmDelete = window.confirm(
+    "Delete this message?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await api.delete(`/messages/delete/${messageId}`);
+
+    setMessages((prev) =>
+      prev.filter((msg) => msg._id !== messageId)
+    );
+  } catch (error) {
+    console.error(error);
+    alert("Failed to delete message.");
+  }
+};
+
   return (
   <div
     style={{
@@ -144,7 +247,30 @@ const sendMessage = async () => {
       boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
     }}
   >
-    <h2>Real-Time Chat</h2>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: "15px",
+      }}
+    >
+      <h2>Real-Time Chat</h2>
+
+      <button
+        onClick={clearChat}
+        style={{
+          background: "#ef4444",
+          color: "#fff",
+          border: "none",
+          padding: "8px 14px",
+          borderRadius: "8px",
+          cursor: "pointer",
+        }}
+      >
+        🗑️ Clear Chat
+      </button>
+    </div>
 
     <div
   style={{
@@ -155,22 +281,68 @@ const sendMessage = async () => {
     background: "#f9fafb",
   }}
 >
+
+  <input
+  type="text"
+  placeholder="🔍 Search conversations..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  style={{
+    width: "100%",
+    padding: "10px",
+    marginBottom: "15px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    outline: "none",
+  }}
+/>
   <h3>Recent Conversations</h3>
 
   {conversations.length === 0 ? (
     <p>No conversations yet.</p>
   ) : (
-    conversations.map((chat) => (
-      <div
-        key={chat.user._id}
-        onClick={() => setReceiverId(chat.user._id)}
-        style={{
-          padding: "10px",
+    conversations
+      .filter((chat) =>
+        chat.user.fullName.toLowerCase().includes(search.toLowerCase())
+      )
+      .map((chat) => (
+        <div
+          key={chat.user._id}
+          onClick={() => setReceiverId(chat.user._id)}
+          style={{
+            padding: "10px",
           cursor: "pointer",
           borderBottom: "1px solid #eee",
         }}
       >
-        <strong>{chat.user.fullName}</strong>
+       <div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  }}
+>
+  <strong>{chat.user.fullName}</strong>
+
+  {unreadCounts[chat.user._id] > 0 && (
+    <span
+      style={{
+        background: "#22c55e",
+        color: "#fff",
+        borderRadius: "50%",
+        minWidth: "22px",
+        height: "22px",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontSize: "12px",
+        fontWeight: "bold",
+      }}
+    >
+      {unreadCounts[chat.user._id]}
+    </span>
+  )}
+</div>
 
         <p
      style={{
@@ -288,6 +460,23 @@ const sendMessage = async () => {
               }}
             >
               <strong>{isMe ? "You" : senderName}</strong>
+
+              {isMe && (
+                <button
+                  onClick={() => deleteMessage(msg._id)}
+                  style={{
+                    marginLeft: "10px",
+                    background: "transparent",
+                    border: "none",
+                    color: "#ef4444",
+                    cursor: "pointer",
+                    fontSize: "12px",
+                    float: "right",
+                  }}
+                >
+                  🗑️
+                </button>
+              )}
 
               <div
                 style={{
