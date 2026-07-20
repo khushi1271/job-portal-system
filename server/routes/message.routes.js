@@ -8,6 +8,8 @@ const {
   markAsSeen,
   getConversations,
   getUnreadCounts,
+  clearChat,
+  deleteMessage,
 } = require("../controllers/message.controller");
 
 const {
@@ -47,6 +49,20 @@ router.get(
   "/unread",
   isAuthenticated,
   getUnreadCounts
+);
+
+// ================= CLEAR CHAT =================
+router.delete(
+  "/clear/:receiverId",
+  isAuthenticated,
+  clearChat
+);
+
+// ================= DELETE SINGLE MESSAGE =================
+router.delete(
+  "/delete/:messageId",
+  isAuthenticated,
+  deleteMessage
 );
 
 module.exports = router;

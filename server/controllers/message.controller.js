@@ -176,11 +176,73 @@ const getUnreadCounts = async (req, res) => {
   }
 };
 
+// ================= CLEAR CHAT =================
+const clearChat = async (req, res) => {
+  try {
+    const { receiverId } = req.params;
+
+    await Message.deleteMany({
+      $or: [
+        { sender: req.user._id, receiver: receiverId },
+        { sender: receiverId, receiver: req.user._id },
+      ],
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Chat cleared successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// ================= DELETE SINGLE MESSAGE =================
+const deleteMessage = async (req, res) => {
+  try {
+    const { messageId } = req.params;
+
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({
+        success: false,
+        message: "Message not found",
+      });
+    }
+
+    // Sirf sender hi apna message delete kar sakta hai
+    if (message.sender.toString() !== req.user._id.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to delete this message",
+      });
+    }
+
+    await Message.findByIdAndDelete(messageId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Message deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   sendMessage,
   getMessages,
   markAsSeen,
   getConversations,
   getUnreadCounts,
+  clearChat,
+  deleteMessage,
 };
 
